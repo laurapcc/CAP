@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <xmmintrin.h>
+#include <x86intrin.h>
 
 #define ARRAY_SIZE 2048
 #define NUMBER_OF_TRIALS 1
@@ -16,6 +18,9 @@ int main(int argc, char *argv[]) {
 
     double m = 1.0001;
 
+    __m256d mm = {1.0001,1.0001,1.0001,1.0001};
+    __m256d sum = {0.0,0.0,0.0,0.0}; // to hold partial sums
+
     /* Populate A and B arrays */
     for (i=0; i < ARRAY_SIZE; i++) {
         b[i] = i;
@@ -25,13 +30,27 @@ int main(int argc, char *argv[]) {
     /* Time */
     clock_t time = clock();
 
-    c = 0;
-
     /* Perform an operation a number of times */
     for (t=0; t < NUMBER_OF_TRIALS; t++) {
-        for (i=0; i < ARRAY_SIZE; i++) {
-            c += m*a[i] + b[i];
+        for (i=0; i < ARRAY_SIZE; i+=4) {
+            //c += m*a[i] + b[i];
+
+            // Load arrays
+            __m256d va = _mm256_load_pd(&a[i]);
+            __m256d vb = _mm256_load_pd(&b[i]);
+
+            // Compute m*a+b
+            __m256d tmp = _mm256_fmadd_pd(mm,va,vb);
+
+            // Accumulate results
+            sum = _mm256_add_pd(tmp, sum);
         }
+    }
+
+    /* Vector sum */
+    c = 0;
+    for (i=0; i<4; i++){
+        c += sum[i];
     }
 
     /* Time */
