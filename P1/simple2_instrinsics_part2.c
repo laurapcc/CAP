@@ -5,7 +5,7 @@
 #include <x86intrin.h>
 
 #define ARRAY_SIZE 2048
-#define NUMBER_OF_TRIALS 1
+#define NUMBER_OF_TRIALS 1000000
 
 /*
  * Statically allocate our arrays.  Compilers can
@@ -21,8 +21,10 @@ int main(int argc, char *argv[]) {
     __m256d mm = {1.0001,1.0001,1.0001,1.0001};
     __m256d sum = {0.0,0.0,0.0,0.0}; // to hold partial sums
 
-    /* Vectorize initialization */
-    //TODO 
+
+    /* Vector initialization */
+    __m256d vector_a[ARRAY_SIZE];
+    __m256d vector_b[ARRAY_SIZE];
 
     /* Populate A and B arrays */
     for (i=0; i < ARRAY_SIZE; i++) {
@@ -35,7 +37,7 @@ int main(int argc, char *argv[]) {
 
     /* Perform an operation a number of times */
     for (t=0; t < NUMBER_OF_TRIALS; t++) {
-        for (i=0; i < ARRAY_SIZE; i++) {
+        for (i=0; i < ARRAY_SIZE; i+=4) {
             //c += m*a[i] + b[i];
 
             // Load arrays
@@ -51,10 +53,25 @@ int main(int argc, char *argv[]) {
     }
 
     /* Vector sum */
-    c = 0;
-    for (i=0; i<4; i++){
-        c += sum[i];
-    }
+    //c = 0;
+    //for (i=0; i<4; i++){
+    //    c += sum[i];
+    //}
+
+    // Get sum[2], sum[3]
+    __m128d xmm = _mm256_extractf128_pd (sum, 1);
+
+    // Extend to 256 bits: sum[2], sum[3], 0, 0
+    __m256d ymm = _mm256_castpd128_pd256(xmm);
+
+    // Perform sum[0]+sum[1], sum[2]+sum[3], sum[2]+sum[3], 0+0
+    sum = _mm256_hadd_pd (sum, ymm); 
+
+    // Perform sum[0]+sum[1]+sum[2]+sum[3]…
+    sum = _mm256_hadd_pd (sum, sum);
+    c = sum[0];
+
+    
 
     /* Time */
     time = clock() - time;

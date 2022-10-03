@@ -48,10 +48,25 @@ int main(int argc, char *argv[]) {
     }
 
     /* Vector sum */
-    c = 0;
-    for (i=0; i<4; i++){
-        c += sum[i];
-    }
+    //c = 0;
+    //for (i=0; i<4; i++){
+    //    c += sum[i];
+    //}
+
+    // Get sum[2], sum[3]
+    __m128d xmm = _mm256_extractf128_pd (sum, 1);
+
+    // Extend to 256 bits: sum[2], sum[3], 0, 0
+    __m256d ymm = _mm256_castpd128_pd256(xmm);
+
+    // Perform sum[0]+sum[1], sum[2]+sum[3], sum[2]+sum[3], 0+0
+    sum = _mm256_hadd_pd (sum, ymm); 
+
+    // Perform sum[0]+sum[1]+sum[2]+sum[3]…
+    sum = _mm256_hadd_pd (sum, sum);
+    c = sum[0];
+
+    
 
     /* Time */
     time = clock() - time;

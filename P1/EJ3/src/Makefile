@@ -20,6 +20,9 @@ stb_image_write.h:
 	@echo "En caso de fallo, descargadlo de https://raw.githubusercontent.com/nothings/stb/master/stb_image_write.h"
 	wget --no-check-certificate https://raw.githubusercontent.com/nothings/stb/master/stb_image_write.h
 
+exec:
+	./greyScale ../images/SD.jpg ../images/HD.jpg ../images/FHD.jpg ../images/4k.jpg ../images/8k.jpg
+
 clean:
 	rm -f *.o *~ greyScale
 	
