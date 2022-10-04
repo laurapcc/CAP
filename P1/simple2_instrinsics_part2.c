@@ -5,13 +5,13 @@
 #include <x86intrin.h>
 
 #define ARRAY_SIZE 2048
-#define NUMBER_OF_TRIALS 1000000
+#define NUMBER_OF_TRIALS 1
 
 /*
  * Statically allocate our arrays.  Compilers can
  * align them correctly.
  */
-static double a[ARRAY_SIZE], b[ARRAY_SIZE], c;
+static double vector_a[ARRAY_SIZE], vector_b[ARRAY_SIZE], c;
 
 int main(int argc, char *argv[]) {
     int i,t;
@@ -23,14 +23,20 @@ int main(int argc, char *argv[]) {
 
 
     /* Vector initialization */
-    __m256d vector_a[ARRAY_SIZE];
-    __m256d vector_b[ARRAY_SIZE];
+    __m256d b_ini = {0.0, 1.0, 2.0, 3.0};
+    __m256d a_ini = {1.0, 2.0, 3.0,4.0};
+    __m256d increment = {4.0,4.0,4.0,4.0};
 
     /* Populate A and B arrays */
-    for (i=0; i < ARRAY_SIZE; i++) {
-        b[i] = i;
-        a[i] = i+1;
+    for (i=0; i < ARRAY_SIZE; i += 4) { 
+        _mm256_store_pd(&vector_b[i], b_ini);
+        b_ini = _mm256_add_pd(b_ini, increment);
+        _mm256_store_pd(&vector_a[i], a_ini);
+        a_ini = _mm256_add_pd(a_ini, increment);
     }
+
+    printf("a[25] = %lf\n", vector_a[25]);
+    printf("b[25] = %lf\n", vector_b[25]);
 
     /* Time */
     clock_t time = clock();
@@ -41,8 +47,8 @@ int main(int argc, char *argv[]) {
             //c += m*a[i] + b[i];
 
             // Load arrays
-            __m256d va = _mm256_load_pd(&a[i]);
-            __m256d vb = _mm256_load_pd(&b[i]);
+            __m256d va = _mm256_load_pd(&vector_a[i]);
+            __m256d vb = _mm256_load_pd(&vector_b[i]);
 
             // Compute m*a+b
             __m256d tmp = _mm256_fmadd_pd(mm,va,vb);
