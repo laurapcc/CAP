@@ -5,7 +5,7 @@
 #include <x86intrin.h>
 
 #define ARRAY_SIZE 2048
-#define NUMBER_OF_TRIALS 1
+#define NUMBER_OF_TRIALS 1000000
 
 /*
  * Statically allocate our arrays.  Compilers can
@@ -34,9 +34,6 @@ int main(int argc, char *argv[]) {
         _mm256_store_pd(&vector_a[i], a_ini);
         a_ini = _mm256_add_pd(a_ini, increment);
     }
-
-    printf("a[25] = %lf\n", vector_a[25]);
-    printf("b[25] = %lf\n", vector_b[25]);
 
     /* Time */
     clock_t time = clock();

@@ -6,6 +6,7 @@ intrinsics:
 
 intrinsics2:
 	gcc -O3 -march=native -o intrinsics2 simple2_instrinsics_part2.c
+	./intrinsics2
 
 clean:
 	rm -f simple2 intrinsics intrinsics2

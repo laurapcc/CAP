@@ -2,8 +2,6 @@
 #include <stdint.h>
 #include <math.h>
 #include <sys/time.h>
-#include <xmmintrin.h>
-#include <x86intrin.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -41,7 +39,7 @@ int main(int nargs, char **argv)
 
         /****** Allocating memory ******/
         // - RGB2Grey
-        uint8_t *grey_image = calloc(width, height);
+        uint8_t *grey_image = malloc(width * height);
         if (!grey_image)
         {
             perror("Could not allocate memory");
@@ -76,31 +74,13 @@ int main(int nargs, char **argv)
 
         gettimeofday(&ini,NULL);
         // RGB to grey scale
-        int r[4], g[4], b[4];
-        __m128 factor1 = {0.2989,0.2989,0.2989,0.2989};
-        __m128 factor2 = {0.5870,0.5870,0.5870,0.5870};
-        __m128 factor3 = {0.1140,0.1140,0.1140,0.1140};
+        int r, g, b;
         for (int i = 0; i < height; i++)
         {
-            for (int j = 0; j < width; j+=4)
+            for (int j = 0; j < width; j++)
             {
-                getRGB(rgb_image, width, height, 4, j, i, &r[0], &g[0], &b[0]);
-                getRGB(rgb_image, width, height, 4, j, i, &r[1], &g[1], &b[1]);
-                getRGB(rgb_image, width, height, 4, j, i, &r[2], &g[2], &b[2]);
-                getRGB(rgb_image, width, height, 4, j, i, &r[3], &g[3], &b[3]);
-                __m128 tmp_r = {r[0], r[1], r[2], r[3]};
-                __m128 tmp_g = {g[0], g[1], g[2], g[3]};
-                __m128 tmp_b = {b[0], b[1], b[2], b[3]};
-                //grey_image[j * width + i] = (int)(0.2989 * r + 0.5870 * g + 0.1140 * b);
-                __m128 mul1 = _mm_mul_ps(factor1, tmp_r);
-                __m128 mul2 = _mm_mul_ps(factor2, tmp_g);
-                __m128 mul3 = _mm_mul_ps(factor3, tmp_b);
-
-                __m128 sum1 = _mm_add_ps(mul1, mul2);
-                __m128 sumt = _mm_add_ps(sum1, mul3);
-
-                printf("%d, %d\n",i,j);
-                _mm_store_ps((float*)&grey_image[i * width + j], sumt);
+                getRGB(rgb_image, width, height, 4, j, i, &r, &g, &b);
+                grey_image[i * width + j] = (int)(0.2989 * r + 0.5870 * g + 0.1140 * b);
             }
         }
 

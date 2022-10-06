@@ -10,6 +10,10 @@ all: greyScale greyScale_in clear
 greyScale: greyScale.c stb_image_write.h stb_image.h
 	$(CC) $(FLAGS) -std=gnu99 $(LIB_DIR) -o $@ greyScale.c $(LIBS)
 
+greyScale2: greyScale2.c stb_image_write.h stb_image.h
+	$(CC) $(FLAGS) -std=gnu99 $(LIB_DIR) -o $@ greyScale2.c $(LIBS)
+	./greyScale2 ../images/HD.jpg
+
 greyScale_in: greyScale_intrinsics.c stb_image_write.h stb_image.h
 	$(CC) $(FLAGS) -std=gnu99 $(LIB_DIR) -o $@ greyScale_intrinsics.c $(LIBS)
 

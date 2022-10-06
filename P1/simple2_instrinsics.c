@@ -5,7 +5,7 @@
 #include <x86intrin.h>
 
 #define ARRAY_SIZE 2048
-#define NUMBER_OF_TRIALS 1
+#define NUMBER_OF_TRIALS 100000
 
 /*
  * Statically allocate our arrays.  Compilers can

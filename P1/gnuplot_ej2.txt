@@ -1,5 +1,5 @@
 set title "Execution time"
 gnuplot> set xlabel "Number of trials"
 gnuplot> set ylabel "Time (seconds)"
-set yrange [0:0.15]
-plot "simple2_times.txt" w lp pt 7 ps 1.3 lc "blue"
+set yrange [0:0.7]
+plot "simple2_times.txt" w lp pt 7 ps 1.3 lc "blue" title "Times"
