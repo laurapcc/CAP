@@ -76,7 +76,7 @@ int main(int nargs, char **argv)
 
         gettimeofday(&ini,NULL);
         // RGB to grey scale
-        int r[4], g[4], b[4];
+        /*int r[4], g[4], b[4];
         __m128 factor1 = {0.2989,0.2989,0.2989,0.2989};
         __m128 factor2 = {0.5870,0.5870,0.5870,0.5870};
         __m128 factor3 = {0.1140,0.1140,0.1140,0.1140};
@@ -103,7 +103,42 @@ int main(int nargs, char **argv)
                 _mm_store_ps((float*)&grey_image[i * width + j], sumt);
             }
         }
+        */
 
+        __m128i datal, datah;
+        __m256i intl, inth;
+        __m256 floatl, floath;
+        __m256 coefficients = {0.2989,0.5870,0.1140,0.0,0.2989,0.5870,0.1140,0.0};
+        __m256 greyl, greyh;
+        __m256 partial_result, result;
+        __m256 reordered;
+        __m128i grey32;
+        __m256i idx = {7, 3, 6, 2, 0, 0, 0, 0};
+        __m128i mask = {3,1,2,0};
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j+=4)
+            {
+                //getRGB(rgb_image, width, height, 4, j, i, &r, &g, &b);
+                uint8_t *image = rgb_image + (i * width + j)*4;
+                datal = _mm_load_epi64((__m128i *)image);
+                datah = _mm_load_epi64((__m128i *)image+8);
+                intl = _mm256_cvtepu8_epi32(datal);
+                inth = _mm256_cvtepu8_epi32(datah);
+                floatl = _mm256_cvtepi32_ps(intl);
+                floath = _mm256_cvtepi32_ps(inth);
+                greyl = _mm256_mul_ps(floatl,coefficients);
+                greyh = _mm256_mul_ps(floath,coefficients);
+                partial_result = _mm256_hadd_ps(greyl,greyh);
+                result = _mm256_hadd_ps(partial_result,partial_result);
+                reordered = _mm256_permutevar8x32_ps(result,idx);
+                grey32 = _mm_cvtps_epi32(_mm256_extractf128_ps(reordered,1));
+
+                grey_image[i * width + j] = _mm_shuffle_epi8(grey32,mask);
+                //grey_image[i * width + j] = (int)(0.2989 * r + 0.5870 * g + 0.1140 * b);
+            }
+        }
+        
         stbi_write_jpg(grey_image_filename, width, height, 1, grey_image, 10);
         free(rgb_image);
 

@@ -33,6 +33,9 @@ exec:
 exec2:
 	./greyScale2 ../images/SD.jpg ../images/HD.jpg ../images/FHD.jpg ../images/4k.jpg ../images/8k.jpg
 
+exec_in:
+	./greyScale_in ../images/SD.jpg 
+
 clean:
 	rm -f *.o *~ greyScale greyScale2 greyScale_in
 	
