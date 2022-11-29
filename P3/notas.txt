@@ -1,0 +1,27 @@
+docker build -t (nombre)/spark_base -f spark_base.Dockerfile .
+docker image ls
+
+En ej 3)
+minikube docker_env
+eval $(minikube -p minikube docker_env)
+
+
+https://archive.apache.org/dist/spark/spark-3.3.1/spark-3.3.1-bin-hadoop3.tgz
+https://archive.apache.org/dist/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz
+
+
+
+alias kubectl="minikube kubectl --"
+kubectl apply -f master.yaml -n <namespace_name>
+kubectl apply -f worker.yaml
+
+kubectl get deployment
+kubectl get service
+
+# create namespace
+kubectl create namespace spark
+
+
+
+ej 4)
+dos clusters dentro de un kubernete??? Si, pero hay que crear 2 namespaces diferentes

@@ -1,0 +1,33 @@
+kind: Deployment
+metadata:
+  name: spark-master
+  namespace: spark
+spec:
+  replica:
+  containers:
+  - name: spark-master
+    image: pla/spark_master
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 7077
+      containerPort: 8080
+
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-master
+  namespace: spark
+spec:
+  type: NodePort
+  ports:
+  # este info viene en el master.sh
+  - name: webui
+    port: 8080
+    targetPort: 8080
+  - name: spark
+    port: 7077
+    targetPort: 7077
+    nodePort: 30707
+   
+
