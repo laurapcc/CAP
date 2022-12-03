@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+  namespace: spark
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spark-worker
+  template:
+    metadata:
+      name: spark-worker
+      labels:
+        app: spark-worker
+    spec: 
+      containers:
+      - name: spark-worker
+        image: pla/spark_worker
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 30707

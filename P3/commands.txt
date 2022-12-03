@@ -1,0 +1,43 @@
+# CREAR COSAS DE K8S
+minikube start
+alias kubectl="minikube kubectl --"
+
+minikube docker-env
+eval $(minikube -p minikube docker-env)
+
+# CREAR IMAGES DOCKER
+docker build -t pla/spark_base -f spark_base.Dockerfile .
+docker build -t pla/spark_master -f spark_master.Dockerfile .
+docker build -t pla/spark_worker -f spark_worker.Dockerfile .
+
+docker image list
+
+# CREAR COSAS DE K8S
+minikube start
+alias kubectl="minikube kubectl --"
+
+kubectl create namespace spark
+
+kubectl apply -f master.yaml -n spark
+kubectl apply -f worker.yaml -n spark
+
+# PARA VER LAS COSAS CREADAS
+kubectl get deployments -n spark
+kubectl get pods -n spark
+kubectl get services -n spark
+
+# PARA BORRAR ALGUNA DE ESTAS COSAS
+kubectl delete deployments spark-master -n spark
+
+
+kubectl describe pod spark-master-8458d44859-wp9mq -n spark
+kubectl logs spark-master-8458d44859-wp9mq -n spark
+
+
+
+spark-submit --deploy-mode cluster --name spark-pi --class org.apache.spark.examples.SparkPi --master spark://spark-master:7077 --conf spark.kubernetes.namespace=spark --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=mirepo/spark:1.0 local:///opt/spark/jars-examples/spark-examples_2.11-2.3.1.jar
+
+
+
+minikube addons enable ingress
+kubectl apply -f ingress.yaml -n spark
