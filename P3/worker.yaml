@@ -7,12 +7,12 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: spark-worker
+      app: spark
   template:
     metadata:
       name: spark-worker
       labels:
-        app: spark-worker
+        app: spark
     spec: 
       containers:
       - name: spark-worker

@@ -30,14 +30,15 @@ kubectl get services -n spark
 kubectl delete deployments spark-master -n spark
 
 
+# PARA DEBUG Y VER ERRORES
 kubectl describe pod spark-master-8458d44859-wp9mq -n spark
 kubectl logs spark-master-8458d44859-wp9mq -n spark
 
+# PARA VER SPARK SERVER localhost:8080
+kubectl port-forward spark-master-8458d44859-xx2xl 8080:8080 -n spark
 
+# PARA METERSE EN EL CONTAINER MASTER o algo asi
+kubectl exec -it spark-master-8458d44859-xx2xl -n spark /bin/bash
 
-spark-submit --deploy-mode cluster --name spark-pi --class org.apache.spark.examples.SparkPi --master spark://spark-master:7077 --conf spark.kubernetes.namespace=spark --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=mirepo/spark:1.0 local:///opt/spark/jars-examples/spark-examples_2.11-2.3.1.jar
-
-
-
-minikube addons enable ingress
-kubectl apply -f ingress.yaml -n spark
+# PARA VER TODO
+minikube dashboard
